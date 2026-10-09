@@ -1,0 +1,136 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: django_backend_image:v0
+    pull_policy: build
+    
+    container_name: django_backend_app
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "8080:8000"
+
+    volumes:
+      - .:/app
+
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+    environment:
+      DATABASE_URL: postgresql://sygrh_user:postgres@postgres:5432/sygrh_db
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0
+
+    networks:
+      - django_network
+
+
+  postgres:
+    image: postgres:16
+    container_name: django_postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: sygrh_db
+      POSTGRES_USER: sygrh_user
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U sygrh_user -d sygrh_db"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - django_network
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: django_redis
+    restart: unless-stopped
+
+    command: redis-server --appendonly yes
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "ping"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+    networks:
+      - django_network
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: django_pgadmin
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@example.com
+      PGADMIN_DEFAULT_PASSWORD: root
+
+    ports:
+      - "5050:80"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+    networks:
+      - django_network
+
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:
+
+
+networks:
+  django_network:
+    driver: bridge

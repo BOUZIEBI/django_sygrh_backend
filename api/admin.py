@@ -1,0 +1,15 @@
+from django.contrib import admin
+
+from .models import Article
+
+
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "titre",
+        "date_publication",
+        "est_actif",
+    )
+    list_filter = ("est_actif",)
+    search_fields = ("titre", "description")

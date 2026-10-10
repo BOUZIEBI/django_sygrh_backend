@@ -79,12 +79,13 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    origin.strip().rstrip("/")
-    for origin in os.getenv(
-        "CORS_ALLOWED_ORIGINS",
-        "",
-    ).split(",")
-    if origin.strip()
+    "https://mesrssitevitrine-production.up.railway.app",
+    #origin.strip().rstrip("/")
+    #for origin in os.getenv(
+    #    "CORS_ALLOWED_ORIGINS",
+    #    "",
+    #).split(",")
+    #if origin.strip()
 ]
 
 CORS_ALLOW_CREDENTIALS = True

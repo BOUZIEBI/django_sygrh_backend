@@ -245,10 +245,6 @@ WSGI_APPLICATION = "sygrh_backend.wsgi.application"
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
-if not DATABASE_URL:
-    raise ValueError(
-        "DATABASE_URL est absente du fichier .env."
-    )
 
 if DATABASE_URL:
     # PostgreSQL sur Railway

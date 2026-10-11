@@ -1,4 +1,8 @@
 services:
+
+  # ==================================================
+  # DJANGO
+  # ==================================================
   app:
     build:
       context: .
@@ -6,12 +10,17 @@ services:
 
     image: django_backend_image:v0
     pull_policy: build
-    
     container_name: django_backend_app
     restart: unless-stopped
 
     env_file:
       - .env
+
+    environment:
+      DATABASE_URL: postgresql://sygrh_user:postgres@postgres:5432/sygrh_backend_db
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "True"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
 
     ports:
       - "8080:8000"
@@ -21,49 +30,42 @@ services:
 
     command: >
       sh -c "
-      python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:8000
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
       "
 
     depends_on:
       postgres:
         condition: service_healthy
-
       redis:
         condition: service_healthy
-
-    environment:
-      DATABASE_URL: postgresql://sygrh_user:postgres@postgres:5432/sygrh_db
-      REDIS_URL: redis://redis:6379/0
-      DEBUG: "True"
-      ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0
 
     networks:
       - django_network
 
-
+  # ==================================================
+  # POSTGRESQL
+  # ==================================================
   postgres:
     image: postgres:16
     container_name: django_postgres
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: sygrh_db
+      POSTGRES_DB: sygrh_backend_db
       POSTGRES_USER: sygrh_user
       POSTGRES_PASSWORD: postgres
 
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - sygrh_backend_postgres_data_v2:/var/lib/postgresql/data
 
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U sygrh_user -d sygrh_db"
-        ]
+        - CMD-SHELL
+        - pg_isready -U sygrh_user -d sygrh_backend_db
       interval: 5s
       timeout: 5s
       retries: 10
@@ -72,7 +74,9 @@ services:
     networks:
       - django_network
 
-
+  # ==================================================
+  # REDIS
+  # ==================================================
   redis:
     image: redis:7-alpine
     container_name: django_redis
@@ -84,15 +88,13 @@ services:
       - "6379:6379"
 
     volumes:
-      - redis_data:/data
+      - sygrh_redis_data:/data
 
     healthcheck:
       test:
-        [
-          "CMD",
-          "redis-cli",
-          "ping"
-        ]
+        - CMD
+        - redis-cli
+        - ping
       interval: 5s
       timeout: 5s
       retries: 10
@@ -101,7 +103,9 @@ services:
     networks:
       - django_network
 
-
+  # ==================================================
+  # PGADMIN
+  # ==================================================
   pgadmin:
     image: dpage/pgadmin4
     container_name: django_pgadmin
@@ -112,25 +116,34 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
 
     ports:
-      - "5050:80"
+      - "5051:80"
 
     depends_on:
       postgres:
         condition: service_healthy
 
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - sygrh_pgadmin_data:/var/lib/pgadmin
 
     networks:
       - django_network
 
-
+# ==================================================
+# VOLUMES
+# ==================================================
 volumes:
-  postgres_data:
-  redis_data:
-  pgadmin_data:
+  sygrh_backend_postgres_data_v2:
+    name: sygrh_backend_postgres_data_v2
 
+  sygrh_redis_data:
+    name: sygrh_redis_data
 
+  sygrh_pgadmin_data:
+    name: sygrh_pgadmin_data
+
+# ==================================================
+# NETWORK
+# ==================================================
 networks:
   django_network:
     driver: bridge

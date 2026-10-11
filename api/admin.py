@@ -1,15 +1,15 @@
 from django.contrib import admin
 
-from .models import Article
+from .models import Genre
 
 
-@admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
-        "titre",
-        "date_publication",
-        "est_actif",
+        "uid",
+        "libelle",
+        "code",
     )
-    list_filter = ("est_actif",)
-    search_fields = ("titre", "description")
+
+    list_filter = ("is_mode",)
+    search_fields = ("libelle", "code")

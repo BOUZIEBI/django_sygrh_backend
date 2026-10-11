@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ENV_FILE = BASE_DIR / ".env"
@@ -236,12 +237,7 @@ SIMPLE_JWT = {
 
 
 WSGI_APPLICATION = "sygrh_backend.wsgi.application"
-ASGI_APPLICATION = "sygrh_backend.asgi.application"
 
-
-# ---------------------------------------------------------
-# Base de données
-# ---------------------------------------------------------
 
 # ---------------------------------------------------------
 # Base de données
@@ -254,30 +250,24 @@ if not DATABASE_URL:
         "DATABASE_URL est absente du fichier .env."
     )
 
-# Détecter une représentation bytes incorrecte
-if DATABASE_URL.startswith(("b'", 'b"')):
-    raise ValueError(
-        "DATABASE_URL contient un préfixe bytes incorrect. "
-        "Supprimez b'...' dans le fichier .env."
-    )
-
-if not DATABASE_URL.startswith((
-    "postgresql://",
-    "postgres://",
-    "sqlite://",
-)):
-    raise ValueError(
-        "DATABASE_URL doit commencer par "
-        "postgresql://, postgres:// ou sqlite://."
-    )
-
-DATABASES = {
-    "default": dj_database_url.parse(
-        DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    ),
-}
+if DATABASE_URL:
+    # PostgreSQL sur Railway
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        ),
+    }
+else:
+    # SQLite en développement local
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        },
+    }
+    
 
 # ---------------------------------------------------------
 # Validation des mots de passe

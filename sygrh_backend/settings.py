@@ -92,7 +92,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOWED_ORIGINS = [
     "https://mesrssitevitrine-production.up.railway.app",
-    #"http://localhost:5173",
+    "http://localhost:5173",
     #origin.strip().rstrip("/")
     #for origin in os.getenv(
     #    "CORS_ALLOWED_ORIGINS",

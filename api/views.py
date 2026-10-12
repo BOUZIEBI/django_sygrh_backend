@@ -18,7 +18,7 @@ class LoginAPIView(APIView):
                 "request": request,
             },
         )
-        print("LoginAPIView initialized")  # Debugging line
+       
         if not serializer.is_valid():
             return Response(
                 {

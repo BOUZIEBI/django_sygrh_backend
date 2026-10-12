@@ -92,7 +92,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOWED_ORIGINS = [
     "https://mesrssitevitrine-production.up.railway.app",
-    "http://localhost:5173",
+    #"http://localhost:5173",
     #origin.strip().rstrip("/")
     #for origin in os.getenv(
     #    "CORS_ALLOWED_ORIGINS",
@@ -142,6 +142,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "EXCEPTION_HANDLER": "api.exceptions.custom_exception_handler",
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
@@ -209,7 +210,7 @@ AUTH_USER_MODEL = "api.User"
 
 SIMPLE_JWT = {
     # Durée du jeton utilisé pour accéder aux routes protégées
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
 
     # Durée du refresh token
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),

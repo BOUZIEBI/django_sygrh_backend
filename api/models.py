@@ -63,6 +63,7 @@ class User(AbstractUser):
     
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     
     # Dates
     cree_le = models.DateTimeField(
@@ -70,7 +71,7 @@ class User(AbstractUser):
         blank=True
     )
 
-    modifier_le = models.DateTimeField(
+    modifie_le = models.DateTimeField(
         null=True,
         blank=True
     )
@@ -1317,6 +1318,15 @@ class Agent(models.Model):
         blank=True,
         related_name="agents",
         db_column="statut_uid"
+    )
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="agent",
+        db_column="user_uid"
     )
 
     validation_fiche = models.ForeignKey(

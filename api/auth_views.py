@@ -6,7 +6,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework import status
+from rest_framework.response import Response
 from .serializers import (
     UserSerializer,
     RegisterSerializer,
@@ -29,6 +32,21 @@ def generate_tokens(user):
         "expires_in": 30 * 60,
     }
 
+
+class CustomJWTAuthentication(JWTAuthentication):
+
+    def get_validated_token(self, raw_token):
+        try:
+            return super().get_validated_token(raw_token)
+
+        except InvalidToken as exc: 
+            return Response({
+                "code": 401,
+                "success": False,
+                "message": "Le token est expiré ou invalide.",
+                "error_code": "TOKEN_INVALID_OR_EXPIRED",
+            }, status=status.HTTP_200_OK)
+            
 
 # ----------------------------------------
 # REGISTER
@@ -87,24 +105,25 @@ class LoginView(APIView):
             username=username,
             password=password
         )
-        print("LoginView: user authenticated:", user)  # Debugging line
+       
         if user is None:
 
             return Response({
-                "code": 401,
+                "code": status.HTTP_401_UNAUTHORIZED,
                 "success": False,
                 "message": "Identifiants incorrects ou compte inactif.",
                 "data": None
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            }, status=status.HTTP_200_OK)
+
 
         if not user.is_active:
 
             return Response({
-                "code": 403,
+                "code": status.HTTP_401_UNAUTHORIZED,
                 "success": False,
                 "message": "Votre compte est désactivé.",
                 "data": None
-            }, status=status.HTTP_403_FORBIDDEN)
+            }, status=status.HTTP_200_OK)
 
         tokens = generate_tokens(user)
 
@@ -125,6 +144,7 @@ class LoginView(APIView):
 
 class GetMeView(APIView):
 
+    #authentication_classes = [CustomJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):

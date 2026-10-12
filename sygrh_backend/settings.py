@@ -71,22 +71,16 @@ DEBUG = get_env_bool(
 
 
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,.up.railway.app",
-    ).split(",")
-    if host.strip()
+    "sygrhbackend-production.up.railway.app",
+    "localhost",
+    "127.0.0.1",
 ]
 
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip().rstrip("/")
-    for origin in os.getenv(
-        "CSRF_TRUSTED_ORIGINS",
-        "",
-    ).split(",")
-    if origin.strip()
+    "https://mesrssitevitrine-production.up.railway.app",
+    "localhost",
+    "127.0.0.1",
 ]
 
 

@@ -79,8 +79,8 @@ def get_env_list(name: str, default: str = "") -> list[str]:
 
 ALLOWED_HOSTS = get_env_list(
     "ALLOWED_HOSTS",
-    #"sygrhbackend-production.up.railway.app,localhost,127.0.0.1",
-    "sygrhbackend-production.up.railway.app",
+    "djangosygrhbackend-production.up.railway.app,localhost,127.0.0.1",
+    #"sygrhbackend-production.up.railway.app",
 )
 
 
@@ -88,7 +88,7 @@ CSRF_TRUSTED_ORIGINS = get_env_list(
     "CSRF_TRUSTED_ORIGINS",
     (
         "https://mesrssitevitrine-production.up.railway.app,"
-        #"http://localhost:5173,"
+        "http://localhost:5173,"
         #"http://localhost:5174"
     ),
 )
@@ -97,7 +97,7 @@ CORS_ALLOWED_ORIGINS = get_env_list(
     "CORS_ALLOWED_ORIGINS",
     (
         "https://mesrssitevitrine-production.up.railway.app,"
-        #"http://localhost:5173,"
+        "http://localhost:5173,"
         #"http://localhost:5174"
     ),
 )
